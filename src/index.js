@@ -1,47 +1,5 @@
-// function animal() {}
-// function dog() {}
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
 
-// Object.defineProperties(animal.prototype, {
-//   name: {
-//     value() {
-//       return 'animal'
-//     }
-//   },
-//   say: {
-//     value() {
-//       return `i am ${this.name()}`
-//     }
-//   }
-// })
-
-// dog.prototype = Object.create(animal.prototype, {
-//   constructor: {
-//     value: dog,
-//     enumerable: false
-//   },
-//   name: {
-//     value() {
-//       return 'dog'
-//     }
-//   }
-// });
-
-// document.write(dog.prototype.constructor);
-
-// class Animal {
-//   name() {
-//     return 'animal'
-//   }
-//   say = () => {
-//     return `i am ${this.name()}`
-//   }
-// }
-
-// class dog extends Animal {
-//   food = 'bone';
-//   name() {
-//     return 'dog'
-//   }
-// }
-
-// document.write(new dog().say());
+ReactDOM.render(<App />, document.getElementById('root'));
