@@ -4,7 +4,6 @@ const htmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractPlugin = require('extract-text-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
-console.log(isDev);
 
 const config = {
   entry: path.resolve(__dirname, 'src/index.js'),

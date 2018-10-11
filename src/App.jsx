@@ -1,35 +1,59 @@
 import React, { Component } from 'react';
-import { observable, action } from 'mobx';
+import { observer, inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 
-class Store {
-  @observable cache = { queue: [] }
-}
-
-const store = new Store();
-
-class Bar extends Component {
-  static propTypes = {
-    queue: PropTypes.array
-  };
-
-  render() {
-    const queue = this.props.queue;
-    console.log(queue);
-    return <div>{queue && queue.length}</div>
+@inject(({ TodoStore }) => ({ todoStore: TodoStore }))
+@observer
+class TodoList extends Component {
+  onNewTodo = () => {
+    this.props.todoStore.addTodo(prompt('Enter a new todo:', 'coffee plz'));
   }
-}
-
-class Foo extends Component {
   render() {
-    const { cache } = store;
-
+    const { todoStore } = this.props;
     return (
       <div>
-        <Bar queue={cache && cache.queue}></Bar>
+        {todoStore.report}
+        <ul>
+          {
+            todoStore.todos.map((todo, idx) => <TodoView todo={todo} key={idx} />)
+          }
+        </ul>
+        {todoStore.pendingRequests > 0 ? <marquee>Loading...</marquee> : null}
+        <button onClick={this.onNewTodo}>new todo</button>
+        <small>(double)</small>
       </div>
     );
   }
 }
 
-export default Foo;
+@observer
+class TodoView extends Component {
+  onToggleCompleted = () => {
+    const todo = this.props.todo;
+    todo.completed = !todo.completed;
+  }
+
+  onRename = () => {
+    const todo = this.props.todo;
+    todo.task = prompt('Task name', todo.task) || todo.task;
+  }
+  render() {
+    const { todo } = this.props;
+
+    return (
+      <li onDoubleClick={this.onRename}>
+        <input
+          type='checkbox'
+          checked={todo.completed}
+          onChange={this.onToggleCompleted}
+        />
+        {todo.task}
+        {
+          todo.assignee ? <small>{todo.assignee.name}</small> : null
+        }
+      </li>
+    );
+  }
+}
+
+export default TodoList;
