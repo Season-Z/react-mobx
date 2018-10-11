@@ -1,5 +1,17 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
+import todoStore from './todoStore';
+import { Provider } from 'mobx-react';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class Base extends Component {
+  render() {
+    return (
+      <Provider todolist={todoStore}>
+        <App />
+      </Provider>
+    );
+  }
+};
+
+ReactDOM.render(<Base />, document.getElementById('root'));

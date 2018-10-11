@@ -1,37 +1,32 @@
-import {
-  observable,
-  autorun,
-  computed
-} from 'mobx';
+import { observable, computed, action } from 'mobx';
 
-class TodoStore {
-  @observable todos = [];
-  @observable pendingRequests = 0;
+class Todo {
+    id = Math.random();
 
-  constructor() {
-      autorun(() => console.log(this.report));
-  }
+    @observable title;
+    @observable finished = false;
 
-  @computed get completedTodosCount() {
-      return this.todos.filter(
-          todo => todo.completed === true
-      ).length;
-  }
-
-  @computed get report() {
-      if (this.todos.length === 0){
-          return "<none>";
-      }
-      return `Next todo: "${this.todos[0].task}". ` + `Progress: ${this.completedTodosCount}/${this.todos.length}`;
-  }
-
-  addTodo(task) {
-      this.todos.push({
-          task: task,
-          completed: false,
-          assignee: null
-      });
-  }
+    constructor(title) {
+        this.title = title;
+    }
 }
 
-export default TodoStore;
+class TodoList {
+    @observable todos = [];
+
+    @computed get unfinishedTodoCount() {
+        return this.todos.filter(todo => !todo.finished).length;
+    }
+
+    @action
+    addTodo = title => {
+        if (!title) return;
+        this.todos.push(new Todo(title));
+    }
+}
+
+const store = new TodoList();
+// store.todos.push(new Todo('Get Coffee'), new Todo('Write blog'));
+// store.todos[0].finished = true;
+
+export default store;

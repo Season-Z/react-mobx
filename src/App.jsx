@@ -2,58 +2,44 @@ import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import PropTypes from 'prop-types';
 
-@inject(({ TodoStore }) => ({ todoStore: TodoStore }))
+const TodoView = ({ todo }) => (
+  <li>
+    <input
+      type="checkbox"
+      checked={todo.finished}
+      // 此处的 onChange 并未遵循 action 的约定，进一步证明了直接更新 store 的数据也是可行的
+      onChange={() => { todo.finished = !todo.finished; }}
+    />
+    {todo.title}
+  </li>
+)
+
+@inject('todolist')
 @observer
-class TodoList extends Component {
-  onNewTodo = () => {
-    this.props.todoStore.addTodo(prompt('Enter a new todo:', 'coffee plz'));
+export default class TodoListView extends Component {
+  state = {
+    title: ''
+  }
+  changeTitle = e => {
+    let title = e.target.value;
+    this.setState({ title });
+  }
+  // 调用 store 中的 addTodoaction 更新 store 里面的数据
+  submit = () => {
+    this.props.todolist.addTodo(this.state.title);
   }
   render() {
-    const { todoStore } = this.props;
     return (
       <div>
-        {todoStore.report}
+        <input type="text" value={this.state.title} onChange={this.changeTitle} />
+        <button onClick={this.submit}>submit</button>
         <ul>
-          {
-            todoStore.todos.map((todo, idx) => <TodoView todo={todo} key={idx} />)
-          }
+          {this.props.todolist.todos.map(todo => (
+            <TodoView todo={todo} key={todo.id} />
+          ))}
         </ul>
-        {todoStore.pendingRequests > 0 ? <marquee>Loading...</marquee> : null}
-        <button onClick={this.onNewTodo}>new todo</button>
-        <small>(double)</small>
+        Tasks left: {this.props.todolist.unfinishedTodoCount}
       </div>
     );
   }
 }
-
-@observer
-class TodoView extends Component {
-  onToggleCompleted = () => {
-    const todo = this.props.todo;
-    todo.completed = !todo.completed;
-  }
-
-  onRename = () => {
-    const todo = this.props.todo;
-    todo.task = prompt('Task name', todo.task) || todo.task;
-  }
-  render() {
-    const { todo } = this.props;
-
-    return (
-      <li onDoubleClick={this.onRename}>
-        <input
-          type='checkbox'
-          checked={todo.completed}
-          onChange={this.onToggleCompleted}
-        />
-        {todo.task}
-        {
-          todo.assignee ? <small>{todo.assignee.name}</small> : null
-        }
-      </li>
-    );
-  }
-}
-
-export default TodoList;
